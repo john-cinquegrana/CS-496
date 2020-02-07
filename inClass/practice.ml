@@ -75,7 +75,7 @@ let rec filter: ('a -> bool) -> 'a list -> 'a list = fun p l ->
 
 let greater_than_zero' = filter is_pos    
 let uppercase' = filter is_upper
-(*let non_empty' = filter is_not_empty *)
+let non_empty' = filter is_not_empty
 
 
 
@@ -102,22 +102,28 @@ let rec foldr: ('a -> 'b  -> 'b)  -> 'b -> 'a list -> 'b = fun f a l ->
 
 let suml' = foldr (fun i j -> i+j) 0
 let andl' = foldr (fun i j -> i&&j) true
-(* let concat' = foldr (fun i j -> i @ j) [] *)
+let concat' = foldr (fun i j -> i @ j) []
 
-
-let rec a l1 l2 =
-  match l1 with
-  | [] -> l2
-  | h::t -> h::a t l2
+(* ******************************* *)
+(* Review of past class and ADTs   *)
+(* 29 Jan 2020 *)
+(* ******************************* *)
 
 let rec foldl f a l =
   match l with
   | [] -> a
-  | h::t -> foldl f (f a h) t
+  | h::t -> foldl f (f a h) t 
 
-type color = Red | Green | Blue
+let rec a l1 l2 =
+  match l1 with
+  | [] -> l2
+  | h::t -> h :: a t l2
 
-let next (c:color) = 
+(* Algebraic Data Types *)
+
+type prim_color = Red | Green | Blue
+
+let next:prim_color -> prim_color = fun c ->
   match c with
   | Red -> Green
   | Green -> Blue
@@ -125,58 +131,81 @@ let next (c:color) =
 
 type btreei = Empty | Node of int*btreei*btreei
 
-let rec sizet: btreei -> int = function
-  | Empty -> 0
-  | Node(i, lt, rt) -> 1 + sizet lt + sizet rt
+let t1 = Node(40,
+              Node(20,Empty,Empty),
+              Node(70,
+                   Node(44,Empty,Empty),
+                   Empty))
 
-let rec bump: btreei -> btreei = function
+let rec sizet:btreei -> int = function
+  | Empty -> 0
+  | Node(i,lt,rt) -> 1 + sizet lt + sizet rt
+
+let rec sumt:btreei -> int = function
+  | Empty -> 0
+  | Node(i,lt,rt) -> i+sumt lt + sumt rt
+
+let rec bump:btreei -> btreei = function
   | Empty -> Empty
-  | Node(i, lt, rt) -> Node( i+1, bump lt, bump rt)
+  | Node(i,lt,rt) -> Node(i+1,bump lt, bump rt)
 
-let rec sum: btreei -> int = function
-  | Empty -> 0
-  | Node( i, lt, rt ) -> i + sum lt + sum rt
+let rec m:btreei -> btreei = function
+  | Empty -> Empty
+  | Node(i,lt,rt) -> Node(i,m rt, m lt)
+                   
+let rec maxt = function
+  | Node(i,Empty,Empty) -> i
+  | Node(i,Empty,rt) -> max i (maxt rt)
+  | Node(i,lt,Empty) -> max i (maxt lt)
+  | Node(i,lt,rt) -> max i (max (maxt lt) (maxt rt))
+  | _ -> failwith "Cannot take max of empty tree"
 
-let rec pre: btreei -> int list = function
-  | Empty -> []
-  | Node( i, lt, rt ) -> i::( pre lt @ pre rt)
+let rec mint = function
+  | Node(i,Empty,Empty) -> i
+  | Node(i,Empty,rt) -> min i (mint rt)
+  | Node(i,lt,Empty) -> min i (mint lt)
+  | Node(i,lt,rt) -> min i (min (mint lt) (mint rt))
+  | _ -> failwith "Cannot take min of empty tree"
 
-let rec inord: btreei -> int list = function
-  | Empty -> []
-  | Node( i, lt, rt ) -> inord lt @ [i] @ inord rt
 
-let rec post: btreei -> int list = function
-  | Empty -> []
-  | Node( i, lt, rt ) -> inord lt @ inord rt @ [i]
+let rec is_bst = function
+  | Empty -> true
+  | Node(i,Empty,Empty) -> true
+  | Node(i,(Node(j,ltj,rtj) as lt),Empty) -> maxt lt < i && is_bst lt
+  | Node(i,Empty,(Node(j,ltj,rtj) as rt)) -> j<mint rt && is_bst rt
+  | Node(i,lt,rt) -> maxt lt <i && i< mint rt && is_bst lt && is_bst rt
+                    
 
-type 'a btree = Empty | Node of int*'a btree*'a btree
+type 'a btree = Empty
+              | Node of 'a * 'a btree * 'a btree
+              
 
-let t1: int btree = Node(20,
-  Node( 12, Empty, Empty),
-  Node( 42,
-    Node( 30, Empty, Empty),
-    Empty)
-)
+let t1 = Node(40,
+              Node(20,Empty,Empty),
+              Node(70,
+                   Node(44,Empty,Empty),
+                   Empty))
 
-let rec mapt f t =
+let rec mapt: ('a ->'b) -> 'a btree -> 'b btree = fun f t ->
   match t with
   | Empty -> Empty
-  | Node( i, lt, rt ) -> Node( f i, mapt f lt, mapt f rt)
+  | Node(i,lt,rt) -> Node(f i,mapt f lt, mapt f rt)
 
-let rec f t =
-  match t with
-  | Empty -> Empty
-  | Node(i, lt, rt) -> Node( i, f rt, f lt)
-
-let rec foldt a f t =
+let rec foldt: 'b  -> ('a -> 'b  -> 'b -> 'b) -> 'a btree -> 'b = fun a f t ->
   match t with
   | Empty -> a
-  | Node(i, lt, rt) -> f i ( foldt a f lt) (foldt a f rt)
+  | Node(i,lt,rt) -> f i (foldt a f lt) (foldt a f rt)
 
-type ('a, 'b) result - Ok of 'a | Error of 'b
+type 'a result = Ok of 'a | Error of string
 
-let rec lookup (e: 'a) (l: ('a*'b) list): 'b result =
-  match l with
+let rec lookup: 'a -> ('a*'b) list -> 'b result = fun k d ->
+  match d with
   | [] -> Error "not found"
-  | (k,v)::t when k=e -> Ok v
-  | (k, v)::t -> lookup e t
+  | (k',v)::t when k=k' -> Ok v
+  | (k',v)::t  -> lookup k t
+
+let rec height: 'a tree -> int = fun t ->
+  match t with
+  | Node(i, [] ) -> 1
+  | Node( i, ts) ->
+    1 + List.fold_left (fun n r -> max n r) 0 (List.map height ts)
