@@ -92,8 +92,16 @@ let tile ((dx,dy):coord) (p:coded_pic) : (coded_pic list) list =
   in
   ver_tile dy dx p
 
-let tri_aligned ((x1,y1):coord) ((x2,y2):coord) ((x3,y3):coord):bool =
-  failwith "Implement"
-  
+let tri_aligned (c1:coord) (c2:coord) (c3:coord):bool =
+  List.mem c2 ( segment c1 c3 )
+
 let rec compress (p:coded_pic):coded_pic =
-  failwith "Implement"
+  match p with
+  | [] -> []
+  | c1::c2::c3::t ->
+    if tri_aligned c1 c2 c3
+      then compress (c1::c3::t)
+      else c1 :: compress (c2::c3::t)
+  | _ -> p
+
+let cp3 = [(0,0);(1,0);(2,0);(2,2);(0,2);(0,0)]
