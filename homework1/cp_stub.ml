@@ -20,63 +20,80 @@ let rec stretch (p:coded_pic) (factor:int) : coded_pic =
 let stretch_m (p:coded_pic) (factor:int) : coded_pic =
   List.map ( fun (x,y) -> (factor*x, factor*y) ) p
 
-let rec segment (cx,cy) (nx,ny) =
+let rec segment ((cx,cy):coord) ((nx,ny):coord) : coord list =
   if ( (cx, cy) = (nx, ny) ) then []
   else
-    let newx = cx + compare cx nx in
-    let newy = cy + compare cy ny in
+    let newx = cx + compare nx cx in
+    let newy = cy + compare ny cy in
     (newx, newy) :: segment (newx, newy) (nx, ny)
 
-let rec coverage ((start::p):coded_pic):coord list =
-  segment start (List.h p) :: coverage p
+let rec coverage ((start::p):coded_pic): coord list =
+  let rec fill ((start::p):coded_pic): coord list =
+    match p with
+    | [] -> []
+    | _ -> segment start (List.hd p) @ fill p
+  in
+  start :: fill (start::p)
+
+let rec last_element = function
+  | [] -> failwith "Bad call to last_element"
+  | [x] -> x
+  | h::t -> last_element t
 
 let coverage_f ((start::p):coded_pic):coord list =
-  List.foldr_right segment p start
+  List.fold_left (fun arr c -> arr @ segment (last_element arr) c) [start] p
 
 let equivalent_pics (cp1:coded_pic) (cp2:coded_pic):bool =
-  let subset list1 list2 =
+  let rec subset list1 list2 =
     match list1 with
     | [] -> true
     | h::t -> (List.mem h list2) && (subset t list2)
   in
-  subset list1 list2 && subset list2 list1
+  subset cp1 cp2 && subset cp2 cp1
 
-let height (p:coded_pic):int =
-  let rec maxy max = function
-    | (x,y)::t -> if ( y > max ) then y else max
-    | [] -> max
-  in
-  let rec miny min = function
-    | (x,y)::t -> if ( y < min ) then y else min
-    | [] -> min
-  in
-  (maxy 0 p) - (miny 0 p)
+let rec max_y (arr:coded_pic) : int =
+  List.fold_right (fun (x2,y2) num -> if num > y2 then num else y2) arr 0
 
-let width (p:coded_pic):int =
-  let rec maxx max = function
-    | (x,y)::t -> if ( x > max ) then x else max
-    | [] -> max
-  in
-  let rec minx min = function
-    | (x,y)::t -> if ( x < min ) then x else min
-    | [] -> min
-  in
-  (maxx 0 p) - (minx 0 p)
+let rec min_y (arr:coded_pic) : int =
+  List.fold_right (fun (x2,y2) num -> if num < y2 then num else y2) arr 0
 
-let tile ((dx,dy):coord) (p:coded_pic) : coded_pic list list =
-  let iter = 1
-  let rec list_shift (sx,sy) list =
-    match list with
-    | (x,y)::t -> (x+sx, y+sy) :: list_shift (sx,sy) t
-    | [] -> []
-  in
-  let rec hor_tile (shift:int) (scale:int) (limit:int) (org:coded_pic) (re:coded_pic): coded_pic list =
-    match shift with
-    | 
+let height (p:coded_pic):int = (max_y p) - (min_y p)
 
+let rec max_x (arr:coded_pic) : int =
+  List.fold_right (fun (x2,y2) num -> if num > x2 then num else x2) arr 0
+
+let rec min_x (arr:coded_pic) : int =
+  List.fold_right (fun (x2,y2) num -> if num < x2 then num else x2) arr 0
+
+let width (p:coded_pic):int = (max_x p) - (min_x p)
+
+let translate (p:coded_pic) ( (x,y): int * int) : coded_pic =
+  List.map (fun (left, right) -> (left+x, right+y) ) p
+
+let tile ((dx,dy):coord) (p:coded_pic) : (coded_pic list) list =
+  (* Adds the sx value to each x coord and the sy value to each y coord *)
+  let shift_y = height p in
+  let shift_x = width p in
+  let rec hor_tile (iter:int) (p:coded_pic) : coded_pic list =
+    match iter with
+    | 0 -> []
+    | 1 -> [p]
+    | x ->  
+      let new_list = translate p (shift_x, 0) in
+      p :: hor_tile (iter-1) new_list
+  in
+  let rec ver_tile (iter:int) (hor_iter:int) (p:coded_pic) : (coded_pic list) list =
+    match iter with
+    | 0 -> []
+    | 1 -> [hor_tile hor_iter p]
+    | x ->
+      let new_list = translate p (0, shift_y) in
+      (hor_tile hor_iter p) :: (ver_tile (iter-1) hor_iter new_list )
+  in
+  ver_tile dy dx p
 
 let tri_aligned ((x1,y1):coord) ((x2,y2):coord) ((x3,y3):coord):bool =
   failwith "Implement"
-
+  
 let rec compress (p:coded_pic):coded_pic =
   failwith "Implement"

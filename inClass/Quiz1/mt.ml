@@ -34,4 +34,3 @@ let rec mt (f:(int -> int)) (ls:(int list)) : (int tree) =
         let t1 = mt f x in
         let t2 = mt f y in
         Node( f( (value t1) + (value t2) ), t1, t2 )
-
