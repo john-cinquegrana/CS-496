@@ -23,15 +23,13 @@ type expr =
   | Fst of expr
   | Snd of expr
   | Not of expr
-  | Abs of expr
-  | Pair of expr * expr
 
+type prog = AProg of expr
 
 let rec string_of_expr e =
   match e with
   | Var s -> "Var "^s
   | Int n -> "Int "^string_of_int n
-  | Abs e -> "Abs "^string_of_expr e
   | Add(e1,e2) -> "Add(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | Sub(e1,e2) -> "Sub(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
   | Mul(e1,e2) -> "Mul(" ^ (string_of_expr e1) ^ "," ^ string_of_expr e2 ^ ")"
@@ -53,3 +51,5 @@ let rec string_of_expr e =
   | Fst(e) -> "Fst("^string_of_expr e^")"
   | Snd(e) -> "Snd("^string_of_expr e^")"
   | Not(e) -> "Not("^string_of_expr e^")"
+
+let string_of_prog (AProg e)  = string_of_expr e
