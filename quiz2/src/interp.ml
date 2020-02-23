@@ -48,7 +48,11 @@ let rec eval_expr : expr -> exp_val ea_result = fun e ->
   | Tuple(es) ->
     build_tuple es
   | Untuple(ids,e1,e2) ->
-    error "implement"
+    eval_expr e1 >>=
+    tuple_of_tupleVal >>= fun ls ->
+    test_list ids ls >>= fun _dis ->
+    extend_env_list ids ls >>+
+    eval_expr e2
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
@@ -65,7 +69,7 @@ and build_tuple : expr list -> exp_val ea_result = fun ls ->
   if has_error result_list then
     get_error result_list
   else
-    Ok (TupleVal (List.map (fun e -> val_of_result e) result_list ))
+    Ok (TupleVal (List.map val_of_result result_list ))
 
 
 let eval_prog (AProg e) = eval_expr e 

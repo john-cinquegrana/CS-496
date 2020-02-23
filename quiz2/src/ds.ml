@@ -81,6 +81,10 @@ let bool_of_boolVal : exp_val -> bool ea_result =  function
   |  BoolVal b -> return b
   | _ -> error "Expected a boolean!"
 
+let tuple_of_tupleVal : exp_val -> exp_val list ea_result =  function
+  |  TupleVal b -> return b
+  | _ -> error "Expected a tuple!"
+
 let rec string_of_list_of_strings = function
   | [] -> ""
   | [id] -> id
@@ -124,3 +128,9 @@ let val_of_result : 'a result -> 'a = fun arg ->
   match arg with
   | Ok s -> s
   | Error err -> failwith "Bad call to val_of_result"
+
+let test_list : 'a list -> 'b list -> 'c ea_result = fun ls1 ls2 ->
+  fun env ->
+  if ( List.length ls1 != List.length ls2 ) then
+    Error "extend_env_list: No.of args does not match no. of params!"
+  else Ok UnitVal
