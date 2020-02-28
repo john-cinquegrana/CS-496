@@ -2,10 +2,10 @@
 
 
 (library
- (name    arith)      ; name of the opam library
- (public_name arith)  ; required for generating documentation
+ (name    let)      ; name of the opam library
+ (public_name let)  ; required for generating documentation
                     ; also requires let.opam in root of workspace
- (synopsis "Interpreter for ARITH")
+ (synopsis "Interpreter for LET")
  ;; (wrapped      false) ; true by default
 )
 

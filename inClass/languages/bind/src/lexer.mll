@@ -48,7 +48,6 @@ rule read =
   | "}"      { RBRACE }
   | ";"      { SEMICOLON }
   | ","      { COMMA }
-  | "abs"    { ABS }
   | "let"    { LET }
   | "="      { EQUALS }
   | "in"     { IN }
@@ -69,6 +68,8 @@ rule read =
   | "fst"    { FST }
   | "snd"    { SND }
   | "not"    { NOT }
+  | "bound?"    { ISBOUND }
+  | "unbind"    { UNBIND }
   | id       { ID (Lexing.lexeme lexbuf) }
   | int      { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof      { EOF }

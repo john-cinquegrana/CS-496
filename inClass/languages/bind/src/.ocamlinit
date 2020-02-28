@@ -1,6 +1,6 @@
-open Arith.Interp;;
-open Arith.Ast;;
-open Arith.Ds;;
+open Let.Interp;;
+open Let.Ds;;
+open Let.Ast;;
 (* Added by OPAM. *)
 let () =
   try Topdirs.dir_directory (Sys.getenv "OCAML_TOPLEVEL_PATH")

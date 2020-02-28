@@ -27,7 +27,6 @@ open Ast
 %token DIVIDED
 %token LPAREN
 %token RPAREN
-%token ABS
 %token LBRACE
 %token RBRACE
 %token LET
@@ -52,6 +51,8 @@ open Ast
 %token SND
 %token NOT
 %token DEBUG
+%token ISBOUND
+%token UNBIND
 %token EOF
 
 (* After declaring the tokens, we have to provide some additional information
@@ -77,7 +78,7 @@ open Ast
    The declaration also says that parsing a [prog] will return an OCaml
    value of type [Ast.expr]. *)
 
-%start <Ast.expr> prog
+%start <Ast.prog> prog
 
 (* The following %% ends the declarations section of the grammar definition. *)
 
@@ -109,7 +110,7 @@ open Ast
    the resulting value to [e].  The action simply says to return that value [e]. *)
 
 prog:
-	| e = expr; EOF { e }
+	| e = expr; EOF { AProg e }
 	;
 
 (* The second rule, named [expr], has productions for integers, variables,
@@ -145,7 +146,6 @@ expr:
     | e1 = expr; MINUS; e2 = expr { Sub(e1,e2) }
     | e1 = expr; TIMES; e2 = expr { Mul(e1,e2) }
     | e1 = expr; DIVIDED; e2 = expr { Div(e1,e2) }
-    | ABS; LPAREN; e=expr; RPAREN { Abs(e) }
     | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
     | FST; LPAREN; e=expr; RPAREN { Fst(e) }
     | SND; LPAREN; e=expr; RPAREN { Snd(e) }
@@ -155,6 +155,8 @@ expr:
     | PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }
     | LPAREN; e1 = expr; e2 = expr; RPAREN { App(e1,e2) }
     | ISZERO; LPAREN; e = expr; RPAREN { IsZero(e) }
+    | ISBOUND; LPAREN; id = ID; RPAREN { IsBound(id) }
+    | UNBIND;  id = ID; IN; e = expr { Unbind(id,e) }
     | NEWREF; LPAREN; e = expr; RPAREN { NewRef(e) }
     | DEREF; LPAREN; e = expr; RPAREN { DeRef(e) }
     | SETREF; LPAREN; e1 = expr; COMMA; e2 = expr; RPAREN { SetRef(e1,e2) }
