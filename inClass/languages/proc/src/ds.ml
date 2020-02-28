@@ -6,8 +6,7 @@
 type exp_val =
   | NumVal of int
   | BoolVal of bool
-  | PairVal of exp_val * exp_val  
-  | UnitVal     
+  | UnitVal       
 type env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
@@ -71,15 +70,10 @@ let int_of_numVal : exp_val -> int ea_result =  function
 let bool_of_boolVal : exp_val -> bool ea_result =  function
   |  BoolVal b -> return b
   | _ -> error "Expected a boolean!"
-
-let pair_of_pairval : exp_val -> (exp_val * exp_val) ea_result = function
-  | PairVal (e1, e2) -> return ( e1, e2 )
-  | _ -> error "Expected a pair!"
-
-let rec string_of_expval = function
+           
+let string_of_expval = function
   | NumVal n -> "NumVal " ^ string_of_int n
   | BoolVal b -> "BoolVal " ^ string_of_bool b
-  | PairVal( v1, v2) -> "PairVal("^ string_of_expval v1 ^ "," ^ string_of_expval v2 ^ ") "
   | UnitVal  -> "UnitVal"
                       
 let rec string_of_env'  = function

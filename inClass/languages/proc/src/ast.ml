@@ -22,6 +22,7 @@ type expr =
   | Pair of expr*expr
   | Fst of expr
   | Snd of expr
+  | Not of expr
 
 type prog = AProg of expr
 
@@ -49,5 +50,6 @@ let rec string_of_expr e =
   | Pair(e1,e2) -> "Pair("^string_of_expr e1^","^string_of_expr e2^")"
   | Fst(e) -> "Fst("^string_of_expr e^")"
   | Snd(e) -> "Snd("^string_of_expr e^")"
+  | Not(e) -> "Not("^string_of_expr e^")"
 
 let string_of_prog (AProg e)  = string_of_expr e

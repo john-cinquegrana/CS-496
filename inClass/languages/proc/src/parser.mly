@@ -47,7 +47,9 @@ open Ast
 %token SEMICOLON
 %token COMMA
 %token PAIR
-%token UNPAIR
+%token FST
+%token SND
+%token NOT
 %token DEBUG
 %token EOF
 
@@ -137,12 +139,15 @@ prog:
 expr:
     | i = INT { Int i }
     | x = ID { Var x }
-    | DEBUG; LPAREN; e=expr; RPAREN { Debug(e) }
+    | DEBUG;LPAREN; e=expr; RPAREN { Debug(e) }
     | e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
     | e1 = expr; MINUS; e2 = expr { Sub(e1,e2) }
     | e1 = expr; TIMES; e2 = expr { Mul(e1,e2) }
     | e1 = expr; DIVIDED; e2 = expr { Div(e1,e2) }
     | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
+    | FST; LPAREN; e=expr; RPAREN { Fst(e) }
+    | SND; LPAREN; e=expr; RPAREN { Snd(e) }
+    | NOT; LPAREN; e=expr; RPAREN { Not(e) }
     | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
     | LETREC; x = ID; LPAREN; y = ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Letrec(x,y,e1,e2) }
     | PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }
@@ -157,8 +162,6 @@ expr:
     | LPAREN; e = expr; RPAREN {e}
       (*    | MINUS e = expr %prec UMINUS { SubExp(IntExp 0,e) }*)
     | LPAREN; MINUS e = expr; RPAREN  { Sub(Int 0, e) }
-    | UNPAIR; LPAREN; x = ID; COMMA; y=ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Unpair(x,y,e1,e2) }
-     
     ;
 
 exprs:
