@@ -6,8 +6,10 @@
 type exp_val =
   | NumVal of int
   | BoolVal of bool
-  | UnitVal       
-type env =
+  | UnitVal
+  | ProcVal of string*expr*env
+and       
+  env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
 
@@ -82,3 +84,5 @@ let rec string_of_env'  = function
 
 let string_of_env : string ea_result = fun env ->
   Ok ("Environment:\n"^ string_of_env' env)
+let lookup_env : env -> env result = fun env ->
+  Ok env

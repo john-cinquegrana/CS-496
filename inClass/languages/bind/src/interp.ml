@@ -54,6 +54,13 @@ let rec eval_expr : expr -> exp_val ea_result = fun e ->
     eval_expr e
   | IsBound(id) ->
     in_env id
+  | Proc(id, e) ->
+    lookup_env >>= fun env ->
+    return @@ ProcVal( id, e, env)
+  | App(e1, e2) ->
+    eval_expr e1 >>= fun v1 ->
+    eval_expr e2 >>= fun v2 ->
+    apply_proc v1 v2
   | Debug(_e) ->
     string_of_env >>= fun str ->
     print_endline str; 
