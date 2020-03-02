@@ -106,7 +106,16 @@ and
     tree_of_treeVal >>= fun right ->
     return @@ TreeVal( Node(dt, left, right) )
   | CaseT(target,emptycase,id1,id2,id3,nodecase) ->
-    error "implement"
+    eval_expr target >>=
+    tree_of_treeVal >>= fun tree ->
+    match tree with
+    | Empty -> eval_expr emptycase
+    | Node( data, lt, rt ) -> begin
+      extend_env id1 data >>+
+      extend_env id2 (TreeVal lt) >>+
+      extend_env id3 (TreeVal rt) >>+
+      eval_expr nodecase
+      end
 and
   eval_prog (AProg e) = eval_expr e
 (***********************************************************************)

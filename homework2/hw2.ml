@@ -30,6 +30,16 @@ let graph = (['x';'y';'z'],
             ([1;1;0], 0);
             ([1;1;1], 1)] )
 
+let graph_2 = (['x';'y';'z'],
+            [([0;0;0], 9);
+            ([0;0;1], 8);
+            ([0;1;0], 7);
+            ([0;1;1], 6);
+            ([1;0;0], 5);
+            ([1;0;1], 4);
+            ([1;1;0], 3);
+            ([1;1;1], 2)] )
+
 (*Computes the height of a tree with a leaf owning 0 for height *)
 let rec dTree_height = function
     | Leaf(x) -> 0
@@ -68,7 +78,7 @@ let rec list_to_tree (ls: char list) : (char, int) dtree =
 let rec replace_leaf_helper (t: ('a, 'b) dtree) (ls: (int list * int) list ) (acc: int list) : ('a, int) dtree =
     match t with
     | Leaf(x) -> Leaf( List.assoc acc ls  )
-    | Node(x, t1, t2) -> Node( x, replace_leaf_helper t1 ls (0::acc), replace_leaf_helper t2 ls (1::acc) )
+    | Node(x, t1, t2) -> Node( x, replace_leaf_helper t1 ls (acc @ [0]), replace_leaf_helper t2 ls (acc @ [1]) )
 
 let replace_leaf_at (t: ('a, 'b) dtree) ((dis,ls): char list * (int list * int) list ) : ('a, int) dtree =
     replace_leaf_helper t ls []
