@@ -49,7 +49,6 @@ open Ast
 %token PAIR
 %token FST
 %token SND
-%token NOT
 %token DEBUG
 %token EOF
 
@@ -147,7 +146,6 @@ expr:
     | PAIR; LPAREN; e1=expr; COMMA; e2=expr; RPAREN { Pair(e1,e2) }
     | FST; LPAREN; e=expr; RPAREN { Fst(e) }
     | SND; LPAREN; e=expr; RPAREN { Snd(e) }
-    | NOT; LPAREN; e=expr; RPAREN { Not(e) }
     | LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
     | LETREC; x = ID; LPAREN; y = ID; RPAREN; EQUALS; e1 = expr; IN; e2 = expr { Letrec(x,y,e1,e2) }
     | PROC; LPAREN; x = ID; RPAREN; LBRACE; e = expr; RBRACE { Proc(x,e) }

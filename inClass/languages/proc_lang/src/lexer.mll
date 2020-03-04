@@ -64,10 +64,6 @@ rule read =
   | "deref"  { DEREF }
   | "setref" { SETREF }
   | "debug"      { DEBUG }
-  | "pair"   { PAIR }
-  | "fst"    { FST }
-  | "snd"    { SND }
-  | "not"    { NOT }
   | id       { ID (Lexing.lexeme lexbuf) }
   | int      { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | eof      { EOF }
